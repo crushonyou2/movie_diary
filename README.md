@@ -19,12 +19,17 @@
     - React (JavaScript 라이브러리)
     - CSS (스타일링)
 
-## 설치 및 실행 방법
+## 배포된 버전
+이 프로젝트의 배포된 버전을 다음 링크에서 직접 확인하실 수 있습니다:
+- **프론트엔드 (Netlify):** https://incredible-travesseiro-af4280.netlify.app/
+- **백엔드 (Google Cloud Run API):** https://movie-backend-866560009438.asia-northeast3.run.app/
+
+## 로컬 개발 환경 설정
 
 ### 1. 프로젝트 클론
 먼저, 이 저장소를 로컬 환경으로 클론합니다.
 ```bash
-git clone <YOUR_REPOSITORY_URL>
+git clone https://github.com/crushonyou2/movie_diary
 cd movie
 ```
 `<YOUR_REPOSITORY_URL>`은 이 GitHub 저장소의 URL입니다.
