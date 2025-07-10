@@ -1,0 +1,629 @@
+:root {
+  --primary-color: #84a98c; /* 부드러운 녹색 계열 */
+  --secondary-color: #cad2c5; /* 밝은 회색 */
+  --background-color: #2f3e46; /* 어두운 청록색 */
+  --card-background: #354f52; /* 약간 더 밝은 청록색 */
+  --text-color: #f0f0f0; /* 밝은 텍스트 */
+  --secondary-text-color: #a0a0a0; /* 보조 텍스트 */
+  --highlight-color: #ffc300; /* 강조 색상 (노란색) */
+}
+
+body {
+  margin: 0;
+  font-family: 'Noto Sans KR', sans-serif; /* 한글 폰트 우선 */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--background-color);
+  color: var(--text-color);
+}
+
+.App {
+  text-align: center;
+}
+
+.App-header {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  padding: 2rem;
+  background-color: var(--background-color);
+}
+
+h1 {
+  margin-bottom: 1.5rem; /* 검색창 추가로 간격 조정 */
+  color: var(--primary-color);
+  font-size: 2.8rem;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.search-section {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 2.5rem;
+  width: 80%;
+  max-width: 600px;
+}
+
+.search-input {
+  flex-grow: 1;
+  padding: 0.8rem 1.2rem;
+  font-size: 1.1rem;
+  border-radius: 10px;
+  border: 1px solid var(--secondary-color);
+  background-color: var(--card-background);
+  color: var(--text-color);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.search-input::placeholder {
+  color: var(--secondary-text-color);
+  opacity: 0.7;
+}
+
+.search-button {
+  padding: 0.8rem 1.5rem;
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: var(--background-color);
+  background-color: var(--primary-color);
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.search-button:hover {
+  background-color: #6a8a70;
+  transform: translateY(-2px);
+}
+
+.search-button:disabled {
+  background-color: var(--secondary-text-color);
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+/* 반응형 디자인에 검색 섹션 추가 */
+@media (max-width: 768px) {
+  .search-section {
+    flex-direction: column;
+    gap: 15px;
+    width: 95%;
+  }
+
+  .search-input {
+    width: 100%;
+  }
+
+  .search-button {
+    width: 100%;
+  }
+}
+
+.diary-input {
+  width: 80%;
+  max-width: 600px;
+  height: 200px;
+  padding: 1.2rem;
+  font-size: 1.1rem;
+  border-radius: 10px;
+  border: 1px solid var(--secondary-color);
+  margin-bottom: 2rem;
+  background-color: var(--card-background);
+  color: var(--text-color);
+  resize: vertical; /* 세로 크기 조절 가능 */
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.search-section {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 2.5rem;
+  width: 80%;
+  max-width: 600px;
+}
+
+.search-input {
+  flex-grow: 1;
+  padding: 0.8rem 1.2rem;
+  font-size: 1.1rem;
+  border-radius: 10px;
+  border: 1px solid var(--secondary-color);
+  background-color: var(--card-background);
+  color: var(--text-color);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.search-input::placeholder {
+  color: var(--secondary-text-color);
+  opacity: 0.7;
+}
+
+.search-button {
+  padding: 0.8rem 1.5rem;
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: var(--background-color);
+  background-color: var(--primary-color);
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.search-button:hover {
+  background-color: #6a8a70;
+  transform: translateY(-2px);
+}
+
+.search-button:disabled {
+  background-color: var(--secondary-text-color);
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+/* 반응형 디자인에 검색 섹션 추가 */
+@media (max-width: 768px) {
+  .search-section {
+    flex-direction: column;
+    gap: 15px;
+    width: 95%;
+  }
+
+  .search-input {
+    width: 100%;
+  }
+
+  .search-button {
+    width: 100%;
+  }
+}
+
+.refresh-button {
+  margin-top: 2.5rem; /* 기존 버튼과의 간격 */
+  background-color: var(--secondary-color); /* 다른 색상으로 구분 */
+  color: var(--background-color);
+  padding: 0.8rem 1.8rem; /* 크기 조정 */
+  font-size: 1.2rem;
+}
+
+.refresh-button:hover {
+  background-color: #b8c2b8; /* 호버 색상 */
+}
+
+.diary-input {
+  width: 80%;
+  max-width: 600px;
+  height: 200px;
+  padding: 1.2rem;
+  font-size: 1.1rem;
+  border-radius: 10px;
+  border: 1px solid var(--secondary-color);
+  margin-bottom: 2rem;
+  background-color: var(--card-background);
+  color: var(--text-color);
+  resize: vertical; /* 세로 크기 조절 가능 */
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.diary-input::placeholder {
+  color: var(--secondary-text-color);
+  opacity: 0.7;
+}
+
+.recommend-button {
+  padding: 1rem 2rem;
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: var(--background-color);
+  background-color: var(--primary-color);
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.recommend-button:hover {
+  background-color: #6a8a70; /* 약간 어두운 호버 색상 */
+  transform: translateY(-2px);
+}
+
+.recommend-button:disabled {
+  background-color: var(--secondary-text-color);
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+.movie-results-container {
+  margin-top: 4rem;
+  width: 90%;
+  max-width: 1200px;
+  background-color: var(--card-background);
+  padding: 3rem;
+  border-radius: 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+}
+
+.movie-results-container h2 {
+  margin-top: 0;
+  color: var(--primary-color);
+  font-size: 2.2rem;
+  margin-bottom: 1rem;
+}
+
+.movie-results-container h3 {
+  color: var(--secondary-color);
+  font-size: 1.6rem;
+  margin-top: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.movie-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 30px;
+  margin-top: 2rem;
+}
+
+.movie-card {
+  background-color: var(--background-color);
+  border-radius: 12px;
+  padding: 20px;
+  width: 280px; /* 카드 너비 약간 증가 */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease;
+  cursor: pointer;
+}
+
+.movie-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.5);
+}
+
+.movie-card img {
+  max-width: 100%;
+  height: 420px; /* 이미지 높이 조정 (280 * 1.5) */
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.movie-card h4 {
+  font-size: 1.3rem;
+  margin: 10px 0 8px 0;
+  color: var(--primary-color);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.5em;
+}
+
+.movie-card .movie-overview {
+  font-size: 1rem;
+  color: var(--secondary-text-color);
+  height: 6em; /* 줄거리 표시 영역 증가 */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.5em;
+}
+
+.highlight-emotion {
+  color: var(--highlight-color);
+  font-weight: bold;
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 3rem;
+}
+
+.loading-spinner {
+  border: 5px solid rgba(255, 255, 255, 0.3);
+  border-top: 5px solid var(--primary-color);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+}
+
+.loading-message {
+  margin-top: 15px;
+  font-size: 1.2rem;
+  color: var(--secondary-text-color);
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.recommendation-reason {
+  font-size: 1.2rem;
+  color: var(--secondary-text-color);
+  line-height: 1.6;
+  max-width: 800px;
+}
+
+/* 모달 스타일 */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.85); /* 더 어두운 오버레이 */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: var(--card-background);
+  padding: 3rem;
+  border-radius: 15px;
+  max-width: 700px; /* 모달 너비 증가 */
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  color: var(--text-color);
+  text-align: center;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+}
+
+.modal-content h2 {
+  color: var(--primary-color);
+  font-size: 2.5rem;
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+}
+
+.modal-content img {
+  max-width: 70%; /* 이미지 크기 조정 */
+  height: auto;
+  border-radius: 10px;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.modal-content p {
+  font-size: 1.1rem;
+  line-height: 1.8;
+  margin-bottom: 0.8rem;
+  color: var(--secondary-text-color);
+}
+
+.modal-content p strong {
+  color: var(--primary-color);
+}
+
+.modal-close-button {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: none;
+  border: none;
+  font-size: 2.5rem;
+  color: var(--secondary-text-color);
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.modal-close-button:hover {
+  color: var(--text-color);
+}
+
+/* 새로운 모달 상세 정보 스타일 */
+.modal-header-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.modal-poster {
+  flex-shrink: 0;
+  width: 200px; /* 포스터 고정 너비 */
+  height: 300px; /* 포스터 고정 높이 (2:3 비율) */
+  object-fit: cover;
+}
+
+.modal-title-info {
+  text-align: left;
+  flex-grow: 1;
+}
+
+.modal-title-info h2 {
+  font-size: 2.2rem;
+  margin-bottom: 1rem;
+}
+
+.modal-info-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.modal-info-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.modal-info-item .icon {
+  font-size: 1.5rem;
+  color: var(--primary-color);
+}
+
+.modal-info-item p {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.modal-overview-section {
+  text-align: left;
+  margin-top: 2rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 2rem;
+}
+
+.modal-overview-section h3 {
+  color: var(--primary-color);
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+}
+
+.modal-overview-section p {
+  font-size: 1.1rem;
+  line-height: 1.7;
+}
+
+/* 반응형 모달 */
+@media (max-width: 768px) {
+  .modal-content {
+    padding: 1.5rem;
+  }
+
+  .modal-header-content {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 1.5rem;
+  }
+
+  .modal-poster {
+    width: 150px;
+    height: 225px;
+  }
+
+  .modal-title-info {
+    text-align: center;
+  }
+
+  .modal-title-info h2 {
+    font-size: 1.8rem;
+  }
+
+  .modal-info-group {
+    align-items: center;
+  }
+
+  .modal-info-item p {
+    font-size: 0.9rem;
+  }
+
+  .modal-overview-section {
+    padding-top: 1.5rem;
+  }
+
+  .modal-overview-section h3 {
+    font-size: 1.5rem;
+  }
+
+  .modal-overview-section p {
+    font-size: 1rem;
+  }
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+  h1 {
+    font-size: 2.2rem;
+  }
+
+  .diary-input {
+    width: 95%;
+  }
+
+  .recommend-button {
+    font-size: 1.1rem;
+    padding: 0.8rem 1.5rem;
+  }
+
+  .movie-results-container {
+    padding: 2rem;
+    width: 95%;
+  }
+
+  .movie-results-container h2 {
+    font-size: 1.8rem;
+  }
+
+  .movie-results-container h3 {
+    font-size: 1.4rem;
+  }
+
+  .movie-list {
+    gap: 15px;
+  }
+
+  .movie-card {
+    width: 180px;
+    padding: 10px;
+  }
+
+  .movie-card img {
+    height: 270px;
+  }
+
+  .movie-card h4 {
+    font-size: 1rem;
+  }
+
+  .movie-card .movie-overview {
+    font-size: 0.85rem;
+    height: 4.5em;
+  }
+
+  .modal-content {
+    padding: 2rem;
+  }
+
+  .modal-content h2 {
+    font-size: 2rem;
+  }
+
+  .modal-content img {
+    max-width: 90%;
+  }
+
+  .modal-content p {
+    font-size: 0.95rem;
+  }
+
+  .modal-close-button {
+    font-size: 2rem;
+  }
+}
+
+.refresh-button {
+  margin-top: 2.5rem; /* 기존 버튼과의 간격 */
+  background-color: var(--secondary-color); /* 다른 색상으로 구분 */
+  color: var(--background-color);
+  padding: 0.8rem 1.8rem; /* 크기 조정 */
+  font-size: 1.2rem;
+}
+
+.refresh-button:hover {
+  background-color: #b8c2b8; /* 호버 색상 */
+}
