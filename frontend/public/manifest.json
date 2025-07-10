@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "Movie Diary",
+  "name": "오늘의 일기, 오늘의 영화",
   "icons": [
     {
       "src": "favicon.ico",
