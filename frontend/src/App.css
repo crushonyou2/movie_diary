@@ -363,6 +363,41 @@ h1 {
   max-width: 800px;
 }
 
+/* OTT 로고 스타일 */
+.ott-providers {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.ott-providers p {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: bold;
+  color: var(--text-color);
+}
+
+.ott-logo {
+  width: 40px; /* 로고 크기 조정 */
+  height: 40px;
+  border-radius: 8px;
+  object-fit: cover;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.ott-link {
+  color: var(--primary-color);
+  text-decoration: none;
+  font-weight: bold;
+  transition: color 0.2s ease;
+}
+
+.ott-link:hover {
+  color: var(--highlight-emotion-color);
+}
+
 /* 모달 스타일 */
 .modal-overlay {
   position: fixed;
