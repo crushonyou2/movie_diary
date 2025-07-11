@@ -15,6 +15,7 @@ app = FastAPI()
 # CORS 설정
 origins = [
     "http://localhost:3000",  # React 앱의 주소
+    "https://incredible-travesseiro-af4280.netlify.app", # Netlify 앱의 주소
 ]
 
 app.add_middleware(
@@ -212,7 +213,7 @@ async def search_movies(query: str):
 
 @app.get("/api/movie-details/{movie_id}")
 async def get_movie_details(movie_id: int):
-    url = f"https://api.themoviedb.org/3/movie/{movie_id}?api_key={tmdb_api_key}&language=ko-KR&append_to_response=credits"
+    url = f"https://api.themoviedb.org/3/movie/{movie_id}?api_key={tmdb_api_key}&language=ko-KR&append_to_response=credits,watch/providers"
     try:
         response = requests.get(url)
         response.raise_for_status() # 오류 발생 시 예외 처리
