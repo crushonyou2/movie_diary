@@ -25,10 +25,11 @@ const MovieDetailModal = ({ movie, onClose }) => {
         <button className="modal-close-button" onClick={onClose}>&times;</button>
         <div className="modal-header-content">
           <img 
-            src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+            src={`https://image.tmdb.org/t/p/w300${movie.poster_path}`}
             alt={`${movie.title} 포스터`} 
             onError={(e) => { e.target.onerror = null; e.target.src='https://via.placeholder.com/500x750.png?text=Image+Not+Found'}} 
             className="modal-poster"
+            loading="lazy"
           />
           <div className="modal-title-info">
             <h2>{movie.title}</h2>
@@ -84,6 +85,7 @@ const MovieDetailModal = ({ movie, onClose }) => {
                         alt={provider.provider_name}
                         title={provider.provider_name}
                         className="ott-logo"
+                        loading="lazy"
                       />
                     ))}
                   </div>
@@ -98,6 +100,7 @@ const MovieDetailModal = ({ movie, onClose }) => {
                         alt={provider.provider_name}
                         title={provider.provider_name}
                         className="ott-logo"
+                        loading="lazy"
                       />
                     ))}
                   </div>
@@ -112,6 +115,7 @@ const MovieDetailModal = ({ movie, onClose }) => {
                         alt={provider.provider_name}
                         title={provider.provider_name}
                         className="ott-logo"
+                        loading="lazy"
                       />
                     ))}
                   </div>
@@ -297,9 +301,10 @@ function App() {
               {searchResults.map((movie) => (
                 <div key={movie.id} className="movie-card" onClick={() => handleCardClick(movie.id)}>
                   <img 
-                    src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+                    src={`https://image.tmdb.org/t/p/w200${movie.poster_path}`}
                     alt={`${movie.title} 포스터`} 
                     onError={(e) => { e.target.onerror = null; e.target.src='https://via.placeholder.com/500x750.png?text=Image+Not+Found'}} 
+                    loading="lazy"
                   />
                   <h4>{movie.title}</h4>
                   <p className="movie-overview">{movie.overview}</p>
@@ -322,9 +327,10 @@ function App() {
               {movies.map((movie) => (
                 <div key={movie.id} className="movie-card" onClick={() => handleCardClick(movie.id)}>
                   <img 
-                    src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+                    src={`https://image.tmdb.org/t/p/w200${movie.poster_path}`}
                     alt={`${movie.title} 포스터`} 
                     onError={(e) => { e.target.onerror = null; e.target.src='https://via.placeholder.com/500x750.png?text=Image+Not+Found'}} 
+                    loading="lazy"
                   />
                   <h4>{movie.title}</h4>
                   <p className="movie-overview">{movie.overview}</p>
