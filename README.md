@@ -7,8 +7,10 @@
 - **일기 기반 감정 분석:** 사용자가 작성한 일기 내용을 바탕으로 핵심 감정을 추출합니다.
 - **맞춤형 영화 추천:** 분석된 감정에 따라 사용자에게 최적화된 영화 목록을 추천합니다.
 - **영화 검색:** 특정 영화 제목으로 영화를 검색하고 상세 정보를 확인할 수 있습니다.
-- **영화 상세 정보 모달:** 추천 또는 검색된 영화의 포스터, 줄거리, 개봉일, 평점, 러닝타임, 장르, 감독, 주연 배우 등 상세 정보를 모달 형태로 제공합니다.
+- **영화 상세 정보 모달:** 추천 또는 검색된 영화의 포스터, 줄거리, 개봉일, 평점, 러닝타임, 장르, 감독, 주연 배우 등 상세 정보를 **반응형으로** 모달 형태로 제공합니다.
 - **OTT 제공자 정보 표시:** 영화 상세 정보 모달에서 해당 영화를 시청할 수 있는 OTT 서비스(구독, 구매, 대여) 정보를 표시합니다.
+- **사용자 피드백 개선:** 사용자 친화적인 오류 메시지 및 검색/추천 결과 없음 피드백을 제공하여 사용성을 높였습니다.
+- **성능 최적화:** 이미지 로딩 최적화 및 모달 컴포넌트의 지연 로딩을 통해 초기 로딩 성능을 향상시켰습니다.
 
 ## 기술 스택
 - **백엔드:**
@@ -16,6 +18,7 @@
     - FastAPI (웹 프레임워크)
     - Google Generative AI (감정 분석 및 추천 로직)
     - TMDB API (영화 정보 연동)
+    - **Python `logging` 모듈 (백엔드 로깅)**
 - **프론트엔드:**
     - React (JavaScript 라이브러리)
     - CSS (스타일링)
@@ -33,7 +36,6 @@
 git clone https://github.com/crushonyou2/movie_diary
 cd movie
 ```
-`<YOUR_REPOSITORY_URL>`은 이 GitHub 저장소의 URL입니다.
 
 ### 2. 백엔드 설정 및 실행
 
@@ -58,11 +60,12 @@ pip install -r requirements.txt # requirements.txt 파일이 있다면
 pip install fastapi uvicorn python-dotenv google-generativeai requests
 ```
 
-`.env` 파일을 생성하고 Google Generative AI API 키를 추가합니다.
+`.env` 파일을 생성하고 Google Generative AI API 키와 TMDB API 키를 추가합니다.
 ```
 GOOGLE_API_KEY="YOUR_GOOGLE_API_KEY"
+TMDB_API_KEY="YOUR_TMDB_API_KEY"
 ```
-`YOUR_GOOGLE_API_KEY`를 실제 Google Generative AI API 키로 교체하세요.
+`YOUR_GOOGLE_API_KEY`와 `YOUR_TMDB_API_KEY`를 실제 API 키로 교체하세요.
 
 백엔드 서버를 실행합니다.
 ```bash
