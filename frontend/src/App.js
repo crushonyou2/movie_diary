@@ -171,6 +171,7 @@ function App() {
     setSearchResults([]); // 추천 시 검색 결과 초기화
     setErrorMessage(''); // 새로운 요청 시 오류 메시지 초기화
     setHasRecommended(true); // 추천 버튼이 눌렸음을 표시
+    setHasSearched(false); // 추천 시 검색 상태 초기화
 
     try {
       const response = await fetch('https://movie-backend-866560009438.asia-northeast3.run.app/api/recommend-movie', {
@@ -211,6 +212,7 @@ function App() {
     setSearchResults([]);
     setErrorMessage(''); // 새로운 요청 시 오류 메시지 초기화
     setHasSearched(true); // 검색 버튼이 눌렸음을 표시
+    setHasRecommended(false); // 검색 시 추천 상태 초기화
 
     try {
       const response = await fetch(`https://movie-backend-866560009438.asia-northeast3.run.app/api/search-movies?query=${encodeURIComponent(searchQuery)}`);
