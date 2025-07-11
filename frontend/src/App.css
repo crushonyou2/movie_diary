@@ -580,3 +580,18 @@ h1 {
 .refresh-button:hover {
   background-color: #b8c2b8; /* 호버 색상 */
 }
+
+/* 오류 메시지 스타일 */
+.error-message {
+  color: #ff6b6b; /* 밝은 빨간색 */
+  font-size: 1.1rem;
+  margin-top: 1rem;
+  font-weight: bold;
+}
+
+/* 결과 없음 메시지 스타일 */
+.no-results-message {
+  color: var(--secondary-text-color);
+  font-size: 1.1rem;
+  margin-top: 1rem;
+}

@@ -144,6 +144,7 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [selectedMovie, setSelectedMovie] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [errorMessage, setErrorMessage] = useState(''); // 오류 메시지 상태
 
   const [searchQuery, setSearchQuery] = useState(''); // 검색어 상태
   const [searchResults, setSearchResults] = useState([]); // 검색 결과 상태
@@ -151,7 +152,7 @@ function App() {
 
   const handleRecommend = async () => {
     if (!diary.trim()) {
-      alert('일기를 작성해주세요.');
+      setErrorMessage('일기를 작성해주세요.');
       return;
     }
 
@@ -162,6 +163,7 @@ function App() {
     setSelectedMovie(null);
     setShowModal(false);
     setSearchResults([]); // 추천 시 검색 결과 초기화
+    setErrorMessage(''); // 새로운 요청 시 오류 메시지 초기화
 
     try {
       const response = await fetch('https://movie-backend-866560009438.asia-northeast3.run.app/api/recommend-movie', {
@@ -173,7 +175,8 @@ function App() {
       });
 
       if (!response.ok) {
-        throw new Error('서버에서 응답을 받지 못했습니다.');
+        const errorData = await response.json();
+        throw new Error(errorData.detail || '서버에서 응답을 받지 못했습니다.');
       }
 
       const data = await response.json();
@@ -182,7 +185,7 @@ function App() {
       setReason(data.reason);
     } catch (error) {
       console.error('Error fetching recommendation:', error);
-      alert('영화 추천을 받는 중 오류가 발생했습니다.');
+      setErrorMessage(`영화 추천 중 오류 발생: ${error.message}`);
     } finally {
       setIsLoading(false);
     }
@@ -199,34 +202,38 @@ function App() {
     setEmotion('');
     setReason('');
     setSearchResults([]);
+    setErrorMessage(''); // 새로운 요청 시 오류 메시지 초기화
 
     try {
       const response = await fetch(`https://movie-backend-866560009438.asia-northeast3.run.app/api/search-movies?query=${encodeURIComponent(searchQuery)}`);
       if (!response.ok) {
-        throw new Error('영화 검색에 실패했습니다.');
+        const errorData = await response.json();
+        throw new Error(errorData.detail || '영화 검색에 실패했습니다.');
       }
       const data = await response.json();
       setSearchResults(data.results);
     } catch (error) {
       console.error('Error searching movies:', error);
-      alert('영화 검색 중 오류가 발생했습니다.');
+      setErrorMessage(`영화 검색 중 오류 발생: ${error.message}`);
     } finally {
       setIsSearching(false);
     }
   };
 
   const handleCardClick = async (movieId) => {
+    setErrorMessage(''); // 새로운 요청 시 오류 메시지 초기화
     try {
       const response = await fetch(`https://movie-backend-866560009438.asia-northeast3.run.app/api/movie-details/${movieId}`);
       if (!response.ok) {
-        throw new Error('영화 상세 정보를 가져오지 못했습니다.');
+        const errorData = await response.json();
+        throw new Error(errorData.detail || '영화 상세 정보를 가져오지 못했습니다.');
       }
       const details = await response.json();
       setSelectedMovie(details);
       setShowModal(true);
     } catch (error) {
       console.error('Error fetching movie details:', error);
-      alert('영화 상세 정보를 불러오는 중 오류가 발생했습니다.');
+      setErrorMessage(`영화 상세 정보를 불러오는 중 오류 발생: ${error.message}`);
     }
   };
 
@@ -263,6 +270,8 @@ function App() {
           {isLoading ? '분석 중...' : '영화 추천받기'}
         </button>
 
+        {errorMessage && <p className="error-message">{errorMessage}</p>}
+
         {isLoading && (
           <div className="loading-container">
             <div className="loading-spinner"></div>
@@ -275,6 +284,10 @@ function App() {
             <div className="loading-spinner"></div>
             <p className="loading-message">영화 검색 중입니다...</p>
           </div>
+        )}
+
+        {!isSearching && searchQuery.trim() && searchResults.length === 0 && (
+          <p className="no-results-message">검색 결과가 없습니다.</p>
         )}
 
         {searchResults.length > 0 && !isSearching && (
@@ -294,6 +307,10 @@ function App() {
               ))}
             </div>
           </div>
+        )}
+
+        {!isLoading && diary.trim() && movies.length === 0 && !errorMessage && (
+          <p className="no-results-message">추천할 영화를 찾지 못했습니다. 다른 일기를 작성해보세요.</p>
         )}
 
         {movies.length > 0 && !isLoading && (
