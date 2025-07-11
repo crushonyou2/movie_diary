@@ -294,7 +294,7 @@ function App() {
           </div>
         )}
 
-        {!isSearching && hasSearched && searchResults.length === 0 && (
+        {!isSearching && hasSearched && searchResults.length === 0 && searchQuery.trim() !== '' && (
           <p className="no-results-message">검색 결과가 없습니다.</p>
         )}
 
@@ -318,7 +318,7 @@ function App() {
           </div>
         )}
 
-        {!isLoading && hasRecommended && movies.length === 0 && !errorMessage && (
+        {!isLoading && hasRecommended && movies.length === 0 && diary.trim() !== '' && !errorMessage && (
           <p className="no-results-message">추천할 영화를 찾지 못했습니다. 다른 일기를 작성해보세요.</p>
         )}
 
