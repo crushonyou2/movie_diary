@@ -120,99 +120,6 @@ h1 {
   box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
-.search-section {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 2.5rem;
-  width: 80%;
-  max-width: 600px;
-}
-
-.search-input {
-  flex-grow: 1;
-  padding: 0.8rem 1.2rem;
-  font-size: 1.1rem;
-  border-radius: 10px;
-  border: 1px solid var(--secondary-color);
-  background-color: var(--card-background);
-  color: var(--text-color);
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
-}
-
-.search-input::placeholder {
-  color: var(--secondary-text-color);
-  opacity: 0.7;
-}
-
-.search-button {
-  padding: 0.8rem 1.5rem;
-  font-size: 1.1rem;
-  font-weight: bold;
-  color: var(--background-color);
-  background-color: var(--primary-color);
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.2s ease;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-}
-
-.search-button:hover {
-  background-color: #6a8a70;
-  transform: translateY(-2px);
-}
-
-.search-button:disabled {
-  background-color: var(--secondary-text-color);
-  cursor: not-allowed;
-  box-shadow: none;
-  transform: none;
-}
-
-/* 반응형 디자인에 검색 섹션 추가 */
-@media (max-width: 768px) {
-  .search-section {
-    flex-direction: column;
-    gap: 15px;
-    width: 95%;
-  }
-
-  .search-input {
-    width: 100%;
-  }
-
-  .search-button {
-    width: 100%;
-  }
-}
-
-.refresh-button {
-  margin-top: 2.5rem; /* 기존 버튼과의 간격 */
-  background-color: var(--secondary-color); /* 다른 색상으로 구분 */
-  color: var(--background-color);
-  padding: 0.8rem 1.8rem; /* 크기 조정 */
-  font-size: 1.2rem;
-}
-
-.refresh-button:hover {
-  background-color: #b8c2b8; /* 호버 색상 */
-}
-
-.diary-input {
-  width: 80%;
-  max-width: 600px;
-  height: 200px;
-  padding: 1.2rem;
-  font-size: 1.1rem;
-  border-radius: 10px;
-  border: 1px solid var(--secondary-color);
-  margin-bottom: 2rem;
-  background-color: var(--card-background);
-  color: var(--text-color);
-  resize: vertical; /* 세로 크기 조절 가능 */
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
-}
-
 .diary-input::placeholder {
   color: var(--secondary-text-color);
   opacity: 0.7;
@@ -273,16 +180,16 @@ h1 {
 .movie-list {
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
-  gap: 30px;
+  justify-content: flex-start; /* 왼쪽 정렬로 변경 */
+  gap: 20px; /* 간격 조정 */
   margin-top: 2rem;
+  width: 100%; /* 부모 컨테이너에 꽉 차게 */
 }
 
 .movie-card {
   background-color: var(--background-color);
   border-radius: 12px;
-  padding: 20px;
-  width: 280px; /* 카드 너비 약간 증가 */
+  padding: 15px; /* 패딩 조정 */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -290,6 +197,11 @@ h1 {
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
   transition: transform 0.3s ease-in-out, box-shadow 0.3s ease;
   cursor: pointer;
+  
+  /* 유연한 너비 설정 */
+  flex-grow: 1;
+  flex-basis: 220px; /* 기본 너비 설정 (5개 열 기준) */
+  max-width: 280px; /* 최대 너비 제한 */
 }
 
 .movie-card:hover {
@@ -298,8 +210,9 @@ h1 {
 }
 
 .movie-card img {
-  max-width: 100%;
-  height: 420px; /* 이미지 높이 조정 (280 * 1.5) */
+  width: 100%; /* 너비 100%로 설정 */
+  height: auto; /* 높이 자동 조정 */
+  aspect-ratio: 2 / 3; /* 이미지 비율 유지 */
   object-fit: cover;
   border-radius: 8px;
   margin-bottom: 15px;
@@ -307,18 +220,19 @@ h1 {
 }
 
 .movie-card h4 {
-  font-size: 1.3rem;
+  font-size: 1.2rem; /* 폰트 크기 조정 */
   margin: 10px 0 8px 0;
   color: var(--primary-color);
   overflow: hidden;
   text-overflow: ellipsis;
-  line-height: 1.5em;
+  line-height: 1.4em; /* 줄 높이 조정 */
+  height: 2.8em; /* 두 줄 높이로 제한 */
 }
 
 .movie-card .movie-overview {
-  font-size: 1rem;
+  font-size: 0.9rem; /* 폰트 크기 조정 */
   color: var(--secondary-text-color);
-  height: 6em; /* 줄거리 표시 영역 증가 */
+  height: 5.4em; /* 여섯 줄 높이로 제한 */
   overflow: hidden;
   text-overflow: ellipsis;
   line-height: 1.5em;
@@ -581,6 +495,18 @@ h1 {
 }
 
 /* 반응형 디자인 */
+@media (max-width: 1200px) {
+  .movie-card {
+    flex-basis: calc(25% - 20px); /* 4개 열 */
+  }
+}
+
+@media (max-width: 992px) {
+  .movie-card {
+    flex-basis: calc(33.333% - 20px); /* 3개 열 */
+  }
+}
+
 @media (max-width: 768px) {
   h1 {
     font-size: 2.2rem;
@@ -596,7 +522,7 @@ h1 {
   }
 
   .movie-results-container {
-    padding: 2rem;
+    padding: 1.5rem; /* 패딩 조정 */
     width: 95%;
   }
 
@@ -613,41 +539,32 @@ h1 {
   }
 
   .movie-card {
-    width: 180px;
-    padding: 10px;
-  }
-
-  .movie-card img {
-    height: 270px;
+    flex-basis: calc(50% - 15px); /* 2개 열 */
+    max-width: none; /* 최대 너비 제한 해제 */
   }
 
   .movie-card h4 {
     font-size: 1rem;
+    height: 2.8em;
   }
 
   .movie-card .movie-overview {
     font-size: 0.85rem;
-    height: 4.5em;
+    height: 5.1em; /* 6줄 높이 */
+  }
+}
+
+@media (max-width: 480px) {
+  .movie-card {
+    flex-basis: 100%; /* 1개 열 */
   }
 
-  .modal-content {
-    padding: 2rem;
+  .movie-card h4 {
+    font-size: 1.1rem;
   }
 
-  .modal-content h2 {
-    font-size: 2rem;
-  }
-
-  .modal-content img {
-    max-width: 90%;
-  }
-
-  .modal-content p {
-    font-size: 0.95rem;
-  }
-
-  .modal-close-button {
-    font-size: 2rem;
+  .movie-card .movie-overview {
+    font-size: 0.9rem;
   }
 }
 
