@@ -181,7 +181,7 @@ h1 {
 .movie-list {
   display: flex;
   flex-wrap: wrap;
-  justify-content: flex-start; /* 왼쪽 정렬로 변경 */
+  justify-content: center; /* 중앙 정렬로 변경 */
   gap: 20px; /* 간격 조정 */
   margin-top: 2rem;
   width: 100%; /* 부모 컨테이너에 꽉 차게 */

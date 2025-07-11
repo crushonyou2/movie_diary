@@ -149,10 +149,12 @@ function App() {
   const [selectedMovie, setSelectedMovie] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState(''); // 오류 메시지 상태
+  const [hasRecommended, setHasRecommended] = useState(false); // 추천 버튼 클릭 여부
 
   const [searchQuery, setSearchQuery] = useState(''); // 검색어 상태
   const [searchResults, setSearchResults] = useState([]); // 검색 결과 상태
   const [isSearching, setIsSearching] = useState(false); // 검색 로딩 상태
+  const [hasSearched, setHasSearched] = useState(false); // 검색 버튼 클릭 여부
 
   const handleRecommend = async () => {
     if (!diary.trim()) {
@@ -168,6 +170,7 @@ function App() {
     setShowModal(false);
     setSearchResults([]); // 추천 시 검색 결과 초기화
     setErrorMessage(''); // 새로운 요청 시 오류 메시지 초기화
+    setHasRecommended(true); // 추천 버튼이 눌렸음을 표시
 
     try {
       const response = await fetch('https://movie-backend-866560009438.asia-northeast3.run.app/api/recommend-movie', {
@@ -197,7 +200,7 @@ function App() {
 
   const handleSearch = async () => {
     if (!searchQuery.trim()) {
-      alert('검색어를 입력해주세요.');
+      setErrorMessage('검색어를 입력해주세요.');
       return;
     }
 
@@ -207,6 +210,7 @@ function App() {
     setReason('');
     setSearchResults([]);
     setErrorMessage(''); // 새로운 요청 시 오류 메시지 초기화
+    setHasSearched(true); // 검색 버튼이 눌렸음을 표시
 
     try {
       const response = await fetch(`https://movie-backend-866560009438.asia-northeast3.run.app/api/search-movies?query=${encodeURIComponent(searchQuery)}`);
@@ -290,7 +294,7 @@ function App() {
           </div>
         )}
 
-        {!isSearching && searchQuery.trim() && searchResults.length === 0 && (
+        {!isSearching && hasSearched && searchResults.length === 0 && (
           <p className="no-results-message">검색 결과가 없습니다.</p>
         )}
 
@@ -314,7 +318,7 @@ function App() {
           </div>
         )}
 
-        {!isLoading && diary.trim() && movies.length === 0 && !errorMessage && (
+        {!isLoading && hasRecommended && movies.length === 0 && !errorMessage && (
           <p className="no-results-message">추천할 영화를 찾지 못했습니다. 다른 일기를 작성해보세요.</p>
         )}
 
