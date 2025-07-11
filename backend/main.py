@@ -6,6 +6,10 @@ from dotenv import load_dotenv
 import google.generativeai as genai
 import requests
 from pydantic import BaseModel
+import logging
+
+# 로깅 설정
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # .env 파일에서 환경 변수 로드
 load_dotenv()
@@ -76,14 +80,14 @@ async def analyze_emotion_with_gemini(diary: str) -> str | None:
         response = await model.generate_content_async(prompt)
         emotion = response.text.strip()
         if emotion not in EMOTION_GENRE_MAP:
-            print(f"Gemini가 예상치 못한 답변을 반환했습니다: {emotion}. 임의의 감정으로 대체합니다.")
+            logging.warning(f"Gemini가 예상치 못한 답변을 반환했습니다: {emotion}. 임의의 감정으로 대체합니다.")
             return random.choice(list(EMOTION_GENRE_MAP.keys()))
         return emotion
     except google_exceptions.ResourceExhausted as e:
-        print(f"Gemini API 할당량 초과: {e}. 임의의 감정으로 영화를 추천합니다.")
+        logging.error(f"Gemini API 할당량 초과: {e}. 임의의 감정으로 영화를 추천합니다.")
         return None  # 할당량 초과 시 None 반환
     except Exception as e:
-        print(f"Gemini API 처리 중 예상치 못한 오류 발생: {e}")
+        logging.error(f"Gemini API 처리 중 예상치 못한 오류 발생: {e}")
         raise HTTPException(status_code=500, detail="감정 분석 중 오류가 발생했습니다.")
 
 async def get_movie_recommendation(genre_ids: list[int], num_movies: int = 3):
@@ -118,7 +122,7 @@ async def get_movie_recommendation(genre_ids: list[int], num_movies: int = 3):
                 else:
                     break # 더 이상 결과가 없으면 중단
             except requests.RequestException as e:
-                print(f"TMDB API 오류 (장르 {genre_id}, 페이지 {page}): {e}")
+                logging.error(f"TMDB API 오류 (장르 {genre_id}, 페이지 {page}): {e}")
                 break # 오류 발생 시 현재 장르 중단
 
     # 중복 제거
@@ -131,7 +135,7 @@ async def get_movie_recommendation(genre_ids: list[int], num_movies: int = 3):
 
     # 최후의 보루: 만약 필터링 후에도 영화가 부족하면, 가장 인기 있는 영화 목록에서 가져옴
     if len(unique_movies) < num_movies:
-        print("필터링 후 영화가 부족하여 인기 영화 목록에서 추가로 가져옵니다.")
+        logging.info("필터링 후 영화가 부족하여 인기 영화 목록에서 추가로 가져옵니다.")
         fallback_movies = []
         for page in range(1, 3): # 인기 영화 2페이지까지
             url = f"https://api.themoviedb.org/3/movie/popular?api_key={tmdb_api_key}&language=ko-KR&page={page}"
@@ -144,7 +148,7 @@ async def get_movie_recommendation(genre_ids: list[int], num_movies: int = 3):
                 else:
                     break
             except requests.RequestException as e:
-                print(f"TMDB 인기 영화 API 오류 (페이지 {page}): {e}")
+                logging.error(f"TMDB 인기 영화 API 오류 (페이지 {page}): {e}")
                 break
         
         # 기존 영화와 합치고 중복 제거
@@ -208,7 +212,7 @@ async def search_movies(query: str):
 
         return {"results": filtered_results}
     except requests.RequestException as e:
-        print(f"TMDB 영화 검색 API 오류: {e}")
+        logging.error(f"TMDB 영화 검색 API 오류: {e}")
         raise HTTPException(status_code=500, detail="영화 검색 중 오류가 발생했습니다.")
 
 @app.get("/api/movie-details/{movie_id}")
@@ -220,7 +224,7 @@ async def get_movie_details(movie_id: int):
         details = response.json()
         return details
     except requests.RequestException as e:
-        print(f"TMDB 상세 정보 API 오류: {e}")
+        logging.error(f"TMDB 상세 정보 API 오류: {e}")
         raise HTTPException(status_code=500, detail="영화 상세 정보를 가져오는 중 오류가 발생했습니다.")
 
 @app.get("/")
