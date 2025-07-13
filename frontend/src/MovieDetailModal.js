@@ -1,7 +1,23 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 // 영화 상세 정보를 표시할 모달 컴포넌트
 const MovieDetailModal = ({ movie, onClose }) => {
+  // Esc 키로 모달을 닫는 기능 추가
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') {
+        onClose();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+
+    // 컴포넌트가 언마운트될 때 이벤트 리스너 제거
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [onClose]); // onClose 함수가 변경될 때만 이 효과를 다시 실행
+
   if (!movie) return null;
 
   const director = movie.credits?.crew.find(person => person.job === 'Director');
