@@ -1,30 +1,31 @@
 import os
 import random
+import logging
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 import google.generativeai as genai
 import requests
 from pydantic import BaseModel
-import logging
 
-# 로깅 설정
+# 로깅 설정 (로그가 잘 보이도록 레벨과 포맷 설정)
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-# .env 파일에서 환경 변수 로드
+# .env 파일 로드
 load_dotenv()
 
 app = FastAPI()
 
-# CORS 설정
+# --- CORS 설정 ---
 origins = [
-    "http://localhost:3000",  # React 앱의 주소
-    "https://incredible-travesseiro-af4280.netlify.app", # Netlify 앱의 주소
+    "http://localhost:3000",
+    "http://localhost:5173",
+    "https://crushonyou2.github.io",
 ]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -35,97 +36,142 @@ gemini_api_key = os.getenv("GEMINI_API_KEY")
 tmdb_api_key = os.getenv("TMDB_API_KEY")
 
 if not gemini_api_key:
-    raise ValueError("GEMINI_API_KEY가 .env 파일에 설정되지 않았습니다.")
-genai.configure(api_key=gemini_api_key)
+    logging.error("GEMINI_API_KEY가 설정되지 않았습니다.")
+else:
+    genai.configure(api_key=gemini_api_key)
 
-if not tmdb_api_key:
-    raise ValueError("TMDB_API_KEY가 .env 파일에 설정되지 않았습니다.")
+# --- OTT 공급자 ID 매핑 ---
+OTT_PROVIDERS = {
+    "Netflix": 8,
+    "Watcha": 97,
+    "Wavve": 356,
+    "Disney+": 337,
+    "Apple TV+": 350,
+    "Amazon Prime": 119,
+}
 
-# --- Pydantic 모델 --- (요청 본문 타입 검증)
+# --- 데이터 모델 ---
 class DiaryRequest(BaseModel):
     diary: str
+    ott_filters: list[str] = []
 
-# --- 감정-장르 매핑 ---
+# --- 상수 데이터 ---
 EMOTION_GENRE_MAP = {
-    "기쁨": [35, 10751],  # 코미디, 가족
-    "행복": [35, 10751, 10749], # 코미디, 가족, 로맨스
-    "슬픔": [18, 10749, 10751],  # 드라마, 로맨스, 가족 (위로와 공감에 집중)
-    "분노": [28, 53, 80],  # 액션, 스릴러, 범죄
-    "놀람": [9648, 878, 14], # 미스터리, SF, 판타지
-    "평온": [10749, 16, 99], # 로맨스, 애니메이션, 다큐멘터리
-    "사랑": [10749, 10751, 18], # 로맨스, 가족, 드라마
-    "지루함": [12, 878, 28], # 모험, SF, 액션 (흥미와 자극에 집중)
+    "기쁨": [35, 10751], "행복": [35, 10751, 10749],
+    "슬픔": [18, 10749, 10751], "분노": [28, 53, 80],
+    "놀람": [9648, 878, 14], "평온": [10749, 16, 99],
+    "사랑": [10749, 10751, 18], "지루함": [12, 878, 28],
 }
 
-# --- 감정별 추천 이유 매핑 ---
 EMOTION_REASON_MAP = {
-    "기쁨": "오늘의 기쁨을 두 배로 만들어 줄 유쾌하고 즐거운 영화들을 추천합니다!",
-    "행복": "행복한 당신의 하루에 웃음꽃을 피워줄 따뜻한 영화들을 추천합니다!",
-    "슬픔": "슬픔을 위로하고 마음을 따뜻하게 해줄 감동적인 영화들을 추천합니다.",
-    "분노": "쌓인 스트레스를 시원하게 날려버릴 통쾌한 액션과 모험 영화들을 추천합니다!",
-    "놀람": "예측 불가능한 반전과 흥미진진한 스토리가 가득한 영화들을 추천합니다.",
-    "평온": "잔잔한 감동과 편안함을 선사할 영화들을 추천합니다. 오늘 하루의 마무리를 함께하세요.",
-    "사랑": "사랑스러운 당신의 마음에 설렘을 더해줄 로맨틱한 영화들을 추천합니다.",
-    "지루함": "지루함을 날려버릴 흥미로운 다큐멘터리나 새로운 시각을 제공하는 영화들을 추천합니다.",
+    "기쁨": "오늘의 즐거움을 더해줄 유쾌한 영화들이에요!",
+    "행복": "당신의 행복한 미소를 지켜줄 따뜻한 이야기입니다.",
+    "슬픔": "지친 마음에 위로가 되어줄 감동적인 작품들이에요.",
+    "분노": "스트레스를 날려버릴 짜릿한 액션을 준비했어요!",
+    "놀람": "심장을 쫄깃하게 만들 반전과 스릴을 즐겨보세요.",
+    "평온": "차분한 당신의 하루를 마무리할 잔잔한 영화입니다.",
+    "사랑": "달달한 로맨스로 설렘을 충전해보는 건 어때요?",
+    "지루함": "무료한 시간을 순삭시켜줄 흥미진진한 모험을 떠나봐요!",
 }
 
-from google.api_core import exceptions as google_exceptions
+# --- 전역 변수: 사용할 모델 이름 ---
+SELECTED_MODEL_NAME = "gemini-2.5-flash" # 기본값 설정 (실패 시 대비)
 
-# --- 핵심 로직 함수 ---
+def find_best_available_model():
+    """사용 가능한 모델 목록을 조회하여 최적의 모델(2.5 버전 우선)을 선택합니다."""
+    global SELECTED_MODEL_NAME
+    try:
+        logging.info("사용 가능한 Gemini 모델을 검색 중입니다...")
+        available_models = []
+        # 모델 목록 조회
+        for m in genai.list_models():
+            if 'generateContent' in m.supported_generation_methods:
+                available_models.append(m.name)
+        
+        # [로그 수정] 검색된 모델 목록을 즉시 출력
+        logging.info(f"검색된 모델 목록: {available_models}")
+
+        # [우선순위 수정] 2025년 기준 최신 모델 우선순위 (사용자 로그 기반)
+        priority_models = [
+            "models/gemini-2.5-flash",          # 1순위: 밸런스 최강
+            "models/gemini-2.5-pro",            # 2순위: 고성능
+            "models/gemini-3-pro-preview",      # 3순위: 차세대 미리보기
+            "models/gemini-2.0-flash",          # 4순위: 안정적인 구버전
+            "models/gemini-2.0-flash-exp",      # 5순위
+        ]
+
+        # 우선순위 목록 순회하며 매칭
+        for priority in priority_models:
+            if priority in available_models:
+                SELECTED_MODEL_NAME = priority
+                logging.info(f"✅ 모델 자동 선택 완료: {SELECTED_MODEL_NAME}")
+                return
+
+        # 우선순위 모델이 없을 경우 목록의 첫 번째 선택
+        if available_models:
+             SELECTED_MODEL_NAME = available_models[0]
+             logging.info(f"⚠️ 우선순위 모델(2.5/3.0)을 찾지 못해 목록의 첫 번째 모델 선택: {SELECTED_MODEL_NAME}")
+        else:
+             logging.error("❌ 사용 가능한 모델이 하나도 검색되지 않았습니다. API 키 권한을 확인해주세요.")
+
+    except Exception as e:
+        logging.error(f"모델 목록 조회 중 오류 발생: {e}")
+        logging.info(f"기본값({SELECTED_MODEL_NAME})을 사용합니다.")
+
+# 서버 시작 시 모델 찾기 실행
+if gemini_api_key:
+    find_best_available_model()
+
+# --- 핵심 로직 ---
 async def analyze_emotion_with_gemini(diary: str) -> str | None:
-    """Gemini API를 호출하여 감정을 분석합니다. 할당량 초과 시 None을 반환합니다."""
-    model = genai.GenerativeModel('gemini-2.5-flash')
-    prompt = f"다음 일기 내용의 핵심 감정을 다음 단어 중 하나로 요약해줘: {list(EMOTION_GENRE_MAP.keys())}. 오직 단어 하나만 응답해야 해.\n\n일기: {diary}"
+    # 선택된 최신 모델 사용
+    model = genai.GenerativeModel(SELECTED_MODEL_NAME)
+    
+    prompt = (
+        f"사용자의 일기를 읽고 핵심 감정을 다음 중 하나만 선택해서 단답형으로 대답해줘: "
+        f"{', '.join(EMOTION_GENRE_MAP.keys())}.\n"
+        f"일기 내용: {diary}\n"
+        f"답변(단어 하나만):"
+    )
     try:
         response = await model.generate_content_async(prompt)
         emotion = response.text.strip()
-        if emotion not in EMOTION_GENRE_MAP:
-            logging.warning(f"Gemini가 예상치 못한 답변을 반환했습니다: {emotion}. 임의의 감정으로 대체합니다.")
-            return random.choice(list(EMOTION_GENRE_MAP.keys()))
-        return emotion
-    except google_exceptions.ResourceExhausted as e:
-        logging.error(f"Gemini API 할당량 초과: {e}. 임의의 감정으로 영화를 추천합니다.")
-        return None  # 할당량 초과 시 None 반환
+        for key in EMOTION_GENRE_MAP.keys():
+            if key in emotion:
+                return key
+        return random.choice(list(EMOTION_GENRE_MAP.keys()))
     except Exception as e:
-        logging.error(f"Gemini API 처리 중 예상치 못한 오류 발생: {e}")
-        raise HTTPException(status_code=500, detail="감정 분석 중 오류가 발생했습니다.")
+        logging.error(f"Gemini API Error ({SELECTED_MODEL_NAME}): {e}")
+        return None
 
-async def get_movie_recommendation(genre_ids: list[int], num_movies: int = 3):
+async def get_movie_recommendation(genre_ids: list[int], ott_provider_ids: list[int] = None, num_movies: int = 3):
     all_movies = []
-    min_vote_count = 100 
-    min_vote_average = 6.0 # 최소 평점 6.0점으로 조정
-
-    # TMDB 정렬 기준 목록
-    sort_options = [
-        "popularity.desc",
-        "vote_average.desc",
-        "release_date.desc",
-    ]
-    # 무작위로 정렬 기준 선택
+    min_vote_count = 300 
+    min_vote_average = 6.0 
+    sort_options = ["popularity.desc", "vote_average.desc", "vote_count.desc"]
     selected_sort_by = random.choice(sort_options)
 
-    # 각 장르 ID에 대해 순차적으로 영화를 가져옴
     for genre_id in genre_ids:
-        # 이미 충분한 영화를 가져왔으면 중단
-        if len(all_movies) >= num_movies * 3: # 필요한 영화 수의 3배 정도 확보
-            break
-
-        # 최대 10페이지까지 영화를 가져와서 선택지를 확보
-        for page in range(1, 11): 
+        if len(all_movies) >= num_movies * 5: break
+        for page in range(1, 4): 
             url = f"https://api.themoviedb.org/3/discover/movie?api_key={tmdb_api_key}&with_genres={genre_id}&language=ko-KR&sort_by={selected_sort_by}&vote_count.gte={min_vote_count}&vote_average.gte={min_vote_average}&page={page}"
+            
+            if ott_provider_ids:
+                providers_str = "|".join(map(str, ott_provider_ids))
+                url += f"&with_watch_providers={providers_str}&watch_region=KR"
+
             try:
                 response = requests.get(url)
-                response.raise_for_status()
-                movies_data = response.json()
-                if movies_data.get('results'):
-                    all_movies.extend(movies_data['results'])
-                else:
-                    break # 더 이상 결과가 없으면 중단
-            except requests.RequestException as e:
-                logging.error(f"TMDB API 오류 (장르 {genre_id}, 페이지 {page}): {e}")
-                break # 오류 발생 시 현재 장르 중단
+                if response.status_code == 200:
+                    data = response.json()
+                    if data.get('results'): 
+                        for movie in data['results']:
+                            if not movie.get('overview'): continue
+                            if not movie.get('poster_path'): continue
+                            all_movies.append(movie)
+                    else: break
+            except: break
 
-    # 중복 제거
     unique_movies = []
     seen_ids = set()
     for movie in all_movies:
@@ -133,100 +179,61 @@ async def get_movie_recommendation(genre_ids: list[int], num_movies: int = 3):
             unique_movies.append(movie)
             seen_ids.add(movie['id'])
 
-    # 최후의 보루: 만약 필터링 후에도 영화가 부족하면, 가장 인기 있는 영화 목록에서 가져옴
     if len(unique_movies) < num_movies:
-        logging.info("필터링 후 영화가 부족하여 인기 영화 목록에서 추가로 가져옵니다.")
-        fallback_movies = []
-        for page in range(1, 3): # 인기 영화 2페이지까지
-            url = f"https://api.themoviedb.org/3/movie/popular?api_key={tmdb_api_key}&language=ko-KR&page={page}"
-            try:
-                response = requests.get(url)
-                response.raise_for_status()
-                data = response.json()
-                if data.get('results'):
-                    fallback_movies.extend(data['results'])
-                else:
-                    break
-            except requests.RequestException as e:
-                logging.error(f"TMDB 인기 영화 API 오류 (페이지 {page}): {e}")
-                break
+        fallback_url = f"https://api.themoviedb.org/3/discover/movie?api_key={tmdb_api_key}&language=ko-KR&sort_by=popularity.desc&page=1"
+        if ott_provider_ids:
+            providers_str = "|".join(map(str, ott_provider_ids))
+            fallback_url += f"&with_watch_providers={providers_str}&watch_region=KR"
         
-        # 기존 영화와 합치고 중복 제거
-        for movie in fallback_movies:
-            if movie['id'] not in seen_ids:
-                unique_movies.append(movie)
-                seen_ids.add(movie['id'])
+        try:
+            res = requests.get(fallback_url)
+            if res.status_code == 200:
+                populars = res.json().get('results', [])
+                for movie in populars:
+                    if movie['id'] not in seen_ids and movie.get('overview') and movie.get('poster_path'):
+                        unique_movies.append(movie)
+                        seen_ids.add(movie['id'])
+        except: pass
 
-    if not unique_movies:
-        return [] # 영화가 없으면 빈 리스트 반환
-    
-    # 가져온 모든 고유 영화 중에서 요청한 개수만큼 무작위로 선택
+    if not unique_movies: return [] 
     return random.sample(unique_movies, min(num_movies, len(unique_movies)))
 
-# --- API 엔드포인트 ---
 @app.post("/api/recommend-movie")
 async def recommend_movie_endpoint(request: DiaryRequest):
     if not request.diary.strip():
-        raise HTTPException(status_code=400, detail="일기 내용이 비어있습니다.")
+        raise HTTPException(status_code=400, detail="일기 내용을 적어주세요.")
+    
+    ott_ids = []
+    if request.ott_filters:
+        for ott_name in request.ott_filters:
+            if ott_name in OTT_PROVIDERS:
+                ott_ids.append(OTT_PROVIDERS[ott_name])
 
-    # 1. 감정 분석 (할당량 초과 시 None이 반환됨)
     emotion = await analyze_emotion_with_gemini(request.diary)
-
-    # 2. 감정이 없으면(할당량 초과) 임의의 감정 선택
-    if emotion is None:
-        emotion = random.choice(list(EMOTION_GENRE_MAP.keys()))
-        final_emotion_for_display = f"{emotion} (API 할당량 초과로 임의 선택됨)"
-    else:
-        final_emotion_for_display = emotion
-
-    # 3. 감정에 맞는 장르 ID 가져오기
-    genre_ids = EMOTION_GENRE_MAP.get(emotion, [18])
-
-    # 4. 영화 추천 받기 (여러 개 요청)
-    movies = await get_movie_recommendation(genre_ids, num_movies=3)
-
-    if not movies:
-        raise HTTPException(status_code=404, detail="추천할 영화를 찾지 못했습니다.")
-
-    # 5. 추천 이유 가져오기
-    recommendation_reason = EMOTION_REASON_MAP.get(emotion, "오늘 당신의 하루에 어울리는 영화들을 추천합니다!")
-
-    return {"emotion": final_emotion_for_display, "movies": movies, "reason": recommendation_reason}
+    display_emotion = emotion if emotion else f"{random.choice(list(EMOTION_GENRE_MAP.keys()))} (랜덤)"
+    
+    genre_ids = EMOTION_GENRE_MAP.get(display_emotion.split()[0], [18])
+    movies = await get_movie_recommendation(genre_ids, ott_provider_ids=ott_ids, num_movies=3)
+    
+    return {
+        "emotion": display_emotion,
+        "movies": movies,
+        "reason": EMOTION_REASON_MAP.get(display_emotion.split()[0], "추천 영화입니다.")
+    }
 
 @app.get("/api/search-movies")
 async def search_movies(query: str):
-    if not query.strip():
-        raise HTTPException(status_code=400, detail="검색어가 비어있습니다.")
-
-    min_vote_count = 50 # 검색 결과는 추천보다 기준을 약간 낮춤
-    min_vote_average = 6.0
-
-    url = f"https://api.themoviedb.org/3/search/movie?api_key={tmdb_api_key}&query={query}&language=ko-KR&page=1&vote_count.gte={min_vote_count}&vote_average.gte={min_vote_average}"
+    url = f"https://api.themoviedb.org/3/search/movie?api_key={tmdb_api_key}&query={query}&language=ko-KR"
     try:
-        response = requests.get(url)
-        response.raise_for_status()
-        search_results = response.json()['results']
-        
-        # 검색 결과도 품질 필터링
-        filtered_results = [movie for movie in search_results if movie.get('vote_count', 0) >= min_vote_count and movie.get('vote_average', 0) >= min_vote_average]
-
-        return {"results": filtered_results}
-    except requests.RequestException as e:
-        logging.error(f"TMDB 영화 검색 API 오류: {e}")
-        raise HTTPException(status_code=500, detail="영화 검색 중 오류가 발생했습니다.")
+        return {"results": requests.get(url).json().get('results', [])}
+    except:
+        return {"results": []}
 
 @app.get("/api/movie-details/{movie_id}")
 async def get_movie_details(movie_id: int):
     url = f"https://api.themoviedb.org/3/movie/{movie_id}?api_key={tmdb_api_key}&language=ko-KR&append_to_response=credits,watch/providers"
-    try:
-        response = requests.get(url)
-        response.raise_for_status() # 오류 발생 시 예외 처리
-        details = response.json()
-        return details
-    except requests.RequestException as e:
-        logging.error(f"TMDB 상세 정보 API 오류: {e}")
-        raise HTTPException(status_code=500, detail="영화 상세 정보를 가져오는 중 오류가 발생했습니다.")
+    return requests.get(url).json()
 
 @app.get("/")
 def read_root():
-    return {"Hello": "World"}
+    return {"Hello": f"Movie Diary API is Running! (Model: {SELECTED_MODEL_NAME})"}

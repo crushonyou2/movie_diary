@@ -1,99 +1,94 @@
-# 오늘의 일기, 오늘의 영화
+# 🎬 Movie Diary (v2.0)
 
-## 프로젝트 소개
-'오늘의 일기, 오늘의 영화'는 사용자가 작성한 일기 내용을 분석하여 사용자의 감정을 파악하고, 그 감정에 가장 잘 어울리는 영화를 추천해주는 서비스입니다. 감성적인 연결을 통해 사용자에게 새로운 영화 발견 경험을 제공합니다.
+> **"오늘의 감정을 기록하고, 딱 맞는 영화를 처방받으세요."**
+> AI 기반 감정 분석 및 영화 추천 다이어리 서비스
 
-## 주요 기능
-- **일기 기반 감정 분석:** 사용자가 작성한 일기 내용을 바탕으로 핵심 감정을 추출합니다.
-- **맞춤형 영화 추천:** 분석된 감정에 따라 사용자에게 최적화된 영화 목록을 추천합니다.
-- **영화 검색:** 특정 영화 제목으로 영화를 검색하고 상세 정보를 확인할 수 있습니다.
-- **영화 상세 정보 모달:** 추천 또는 검색된 영화의 포스터, 줄거리, 개봉일, 평점, 러닝타임, 장르, 감독, 주연 배우 등 상세 정보를 **반응형으로** 모달 형태로 제공합니다.
-- **OTT 제공자 정보 표시:** 영화 상세 정보 모달에서 해당 영화를 시청할 수 있는 OTT 서비스(구독, 구매, 대여) 정보를 표시합니다.
-- **사용자 피드백 개선:** 사용자 친화적인 오류 메시지 및 검색/추천 결과 없음 피드백을 제공하여 사용성을 높였습니다.
-- **성능 최적화:** 이미지 로딩 최적화 및 모달 컴포넌트의 지연 로딩을 통해 초기 로딩 성능을 향상시켰습니다.
+![Project Status](https://img.shields.io/badge/Status-Active-success)
+![License](https://img.shields.io/badge/License-MIT-blue)
 
-## 기술 스택
-- **백엔드:**
-    - Python
-    - FastAPI (웹 프레임워크)
-    - Google Generative AI (감정 분석 및 추천 로직)
-    - TMDB API (영화 정보 연동)
-    - **Python `logging` 모듈 (백엔드 로깅)**
-- **프론트엔드:**
-    - React (JavaScript 라이브러리)
-    - CSS (스타일링)
+## 🌟 프로젝트 소개
 
-## 배포된 버전
-이 프로젝트의 배포된 버전을 다음 링크에서 직접 확인하실 수 있습니다:
-- **프론트엔드 (Netlify):** https://incredible-travesseiro-af4280.netlify.app/
-- **백엔드 (Google Cloud Run API):** https://movie-backend-866560009438.asia-northeast3.run.app/
+**Movie Diary**는 사용자가 작성한 일기를 Google Gemini AI가 분석하여, 현재 감정 상태에 가장 잘 어울리는 영화를 추천해주는 서비스입니다. 단순한 추천을 넘어, 일기를 기록하고 지난 감정들을 되돌아볼 수 있는 '나만의 영화 처방전'을 제공합니다.
 
-## 로컬 개발 환경 설정
+### 🚀 v2.0 주요 업데이트
+* **Modern Tech Stack:** Vite + React + Tailwind CSS로 전면 교체하여 압도적인 성능과 디자인 개선
+* **AI 고도화:** 최신 Gemini 2.5 Flash 모델 적용으로 더 섬세한 감정 분석 구현
+* **스마트 필터링:** OTT(Netflix, Watcha 등) 구독 정보 필터링 및 인지도 기반 품질 필터링 적용
+* **사용자 경험 강화:** 내 일기장(History) 기능 추가 (Local Storage 활용)
 
-### 1. 프로젝트 클론
-먼저, 이 저장소를 로컬 환경으로 클론합니다.
-```bash
-git clone https://github.com/crushonyou2/movie_diary
-cd movie
-```
+---
 
-### 2. 백엔드 설정 및 실행
+## 🎨 주요 기능
 
-`backend` 디렉토리로 이동합니다.
-```bash
-cd backend
-```
+1.  **AI 감정 일기 분석**
+일기를 쓰면 AI가 핵심 감정(기쁨, 슬픔, 분노 등)을 분석하고 위로의 메시지를 건넵니다.
+2.  **맞춤형 영화 추천 & OTT 필터**
+감정에 맞는 영화를 추천하되, 내가 구독 중인 OTT(넷플릭스, 왓챠 등)에 있는 작품만 골라볼 수 있습니다.
+3.  **영화 다시 추천받기**
+추천된 영화가 마음에 들지 않다면? 버튼 하나로 새로운 영화 세트를 다시 제안받을 수 있습니다.
+4.  **내 일기장 (History)**
+작성한 일기와 추천받은 영화 기록이 저장되어, 언제든 다시 꺼내볼 수 있습니다.
+5.  **영화 상세 정보**
+줄거리, 평점, 캐스팅 정보, 그리고 **지금 바로 볼 수 있는 OTT 링크**까지 제공합니다.
 
-가상 환경을 생성하고 활성화합니다.
-```bash
-python -m venv venv
-# Windows
-.\venv\Scripts\activate
-# macOS/Linux
-source venv/bin/activate
-```
+---
 
-필요한 Python 패키지를 설치합니다.
-```bash
-pip install -r requirements.txt # requirements.txt 파일이 있다면
-# 또는 필요한 패키지를 개별적으로 설치 (예: fastapi, uvicorn, python-dotenv, google-generativeai, requests)
-pip install fastapi uvicorn python-dotenv google-generativeai requests
-```
+## 🛠 기술 스택 (Tech Stack)
 
-`.env` 파일을 생성하고 Google Generative AI API 키와 TMDB API 키를 추가합니다.
-```
-GOOGLE_API_KEY="YOUR_GOOGLE_API_KEY"
+### Frontend
+* **Core:** React 19, Vite
+* **Styling:** Tailwind CSS, Framer Motion (Animation)
+* **Icons:** Lucide React
+
+### Backend
+* **Core:** Python FastAPI
+* **AI Model:** Google Gemini 2.5 Flash (Auto-detect)
+* **Data Source:** TMDB API (The Movie Database)
+* **Deploy:** Google Cloud Run
+
+---
+
+## 💻 설치 및 실행 방법 (Local Setup)
+
+이 프로젝트를 로컬 환경에서 실행하려면 API 키가 필요합니다.
+
+### 1. 환경 변수 설정 (.env)
+`backend` 폴더 안에 `.env` 파일을 생성하고 아래 키를 입력하세요.
+```env
+GEMINI_API_KEY="YOUR_GOOGLE_AI_STUDIO_KEY"
 TMDB_API_KEY="YOUR_TMDB_API_KEY"
 ```
-`YOUR_GOOGLE_API_KEY`와 `YOUR_TMDB_API_KEY`를 실제 API 키로 교체하세요.
 
-백엔드 서버를 실행합니다.
-```bash
+### 2. 백엔드 실행
+cd backend
+가상환경 생성 및 실행 (권장))
+python -m venv venv
+Windows: .\venv\Scripts\activate
+Mac/Linux: source venv/bin/activate
+
+pip install -r requirements.txt
 uvicorn main:app --reload
-```
-서버는 기본적으로 `http://localhost:8000`에서 실행됩니다.
+서버가 [http://127.0.0.1:8000](http://127.0.0.1:8000) 에서 실행됩니다.
 
-### 3. 프론트엔드 설정 및 실행
-
-새로운 터미널을 열고 `frontend` 디렉토리로 이동합니다.
-```bash
-cd ../frontend
-```
-
-Node.js 의존성을 설치합니다.
-```bash
+### 3. 프론트엔드 실행
+cd frontend
 npm install
-```
+npm run dev
+브라우저에서 http://localhost:5173 접속
 
-프론트엔드 애플리케이션을 실행합니다.
-```bash
-npm start
-```
-애플리케이션은 기본적으로 `http://localhost:3000`에서 실행되며, 자동으로 웹 브라우저가 열립니다.
+---
 
-## 사용 방법
-1.  프론트엔드 애플리케이션(`http://localhost:3000`)에 접속합니다.
-2.  "오늘 하루는 어땠나요? 당신의 이야기를 들려주세요." 텍스트 영역에 일기를 작성합니다.
-3.  "영화 추천받기" 버튼을 클릭하면, 작성된 일기를 바탕으로 감정이 분석되고 해당 감정에 맞는 영화 목록이 추천됩니다.
-4.  "영화 제목으로 검색..." 입력창에 영화 제목을 입력하고 "검색" 버튼을 클릭하면, 해당 영화를 검색하고 결과를 확인할 수 있습니다.
-5.  영화 카드(추천 또는 검색 결과)를 클릭하면 해당 영화의 상세 정보를 모달 창으로 볼 수 있습니다.
+## 🔒 보안 및 배포 정보
+
+* API Key 보안: 모든 API 키는 백엔드 서버(Cloud Run)의 환경 변수로 안전하게 관리되며, 프론트엔드 코드에는 노출되지 않습니다.
+
+* Frontend 배포: GitHub Actions를 통해 GitHub Pages로 자동 배포됩니다.
+
+* Backend 배포: Google Cloud Run을 통해 Serverless 컨테이너로 운영됩니다.
+
+* 배포된 백엔드 주소: https://movie-backend-866560009438.asia-northeast3.run.app
+
+---
+
+### 📝 License
+This project is licensed under the MIT License.
