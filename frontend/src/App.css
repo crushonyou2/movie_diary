@@ -461,6 +461,14 @@ h1 {
     font-size: 1.2rem;
   }
 
+  .movie-list {
+    gap: 15px; /* Reduce gap for smaller screens */
+  }
+
+  .movie-card {
+    width: calc(50% - 7.5px); /* Adjust width for new gap */
+  }
+
   /* Modal Responsive */
   .modal-content {
     padding: 1.5rem;
@@ -501,19 +509,18 @@ h1 {
     font-size: 2rem;
   }
 
-  
-
   .search-button, .recommend-button {
     font-size: 1rem;
     padding: 0.8rem 1.5rem;
   }
 
   .movie-list {
-    gap: 15px;
+    /* gap: 10px; */ /* 매우 작은 화면에서는 간격 제거 */
   }
 
   .movie-card {
-    width: 100%; /* 1열 구조 */
+    width: 90%; /* 단일 열, 좌우 여백 확보 */
+    margin: 0 auto; /* 개별 카드 중앙 정렬 */
   }
 
   .modal-poster {
