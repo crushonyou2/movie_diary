@@ -208,7 +208,11 @@ function App() {
       <header className="fixed top-0 w-full z-40 bg-slate-950/80 backdrop-blur-md border-b border-slate-800">
         <div className="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2 font-bold text-xl tracking-tight text-indigo-400 cursor-pointer" onClick={() => window.location.reload()}>
-            <img src="/logo.svg" alt="Movie Diary" className="w-8 h-8 object-contain" />
+            <img 
+              src={`${import.meta.env.BASE_URL}logo.svg`} 
+              alt="Movie Diary" 
+              className="w-8 h-8 object-contain" 
+            />
             <span>MovieDiary</span>
           </div>
           <nav className="flex gap-1 bg-slate-900 p-1 rounded-full border border-slate-800">
