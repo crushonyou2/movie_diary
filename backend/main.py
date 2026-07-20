@@ -223,16 +223,28 @@ async def recommend_movie_endpoint(request: DiaryRequest):
 
 @app.get("/api/search-movies")
 async def search_movies(query: str):
+    if not query.strip():
+        raise HTTPException(status_code=400, detail="검색어가 비어있습니다.")
+
     url = f"https://api.themoviedb.org/3/search/movie?api_key={tmdb_api_key}&query={query}&language=ko-KR"
     try:
-        return {"results": requests.get(url).json().get('results', [])}
-    except:
-        return {"results": []}
+        response = requests.get(url)
+        response.raise_for_status()
+        return {"results": response.json().get('results', [])}
+    except requests.RequestException as error:
+        logging.error("TMDB 영화 검색 API 오류: %s", error)
+        raise HTTPException(status_code=500, detail="영화 검색 중 오류가 발생했습니다.") from error
 
 @app.get("/api/movie-details/{movie_id}")
 async def get_movie_details(movie_id: int):
     url = f"https://api.themoviedb.org/3/movie/{movie_id}?api_key={tmdb_api_key}&language=ko-KR&append_to_response=credits,watch/providers"
-    return requests.get(url).json()
+    try:
+        response = requests.get(url)
+        response.raise_for_status()
+        return response.json()
+    except requests.RequestException as error:
+        logging.error("TMDB 영화 상세 API 오류: %s", error)
+        raise HTTPException(status_code=500, detail="영화 상세 정보를 가져오는 중 오류가 발생했습니다.") from error
 
 @app.get("/")
 def read_root():

@@ -94,7 +94,7 @@ def test_recommend_movie_success():
 def test_recommend_movie_empty_diary():
     response = client.post("/api/recommend-movie", json={"diary": ""})
     assert response.status_code == 400
-    assert response.json()["detail"] == "일기 내용이 비어있습니다."
+    assert response.json()["detail"] == "일기 내용을 적어주세요."
 
 # --- /api/search-movies 엔드포인트 테스트 ---
 def test_search_movies_success():
