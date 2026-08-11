@@ -2,7 +2,7 @@ name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: ["v2-rebuild"] # 현재 작업 중인 브랜치
+    branches: ["main"]
 
 permissions:
   contents: read
