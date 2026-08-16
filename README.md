@@ -5,7 +5,6 @@
 [![Live](https://img.shields.io/badge/live-GitHub%20Pages-success)](https://crushonyou2.github.io/movie_diary/)
 [![Backend](https://img.shields.io/badge/backend-Cloud%20Run%20(scale--to--zero)-4285F4?logo=googlecloud&logoColor=white)](#설계-판단)
 [![CI/CD](https://img.shields.io/badge/CI%2FCD-GitHub%20Actions-2088FF?logo=githubactions&logoColor=white)](.github/workflows)
-[![License](https://img.shields.io/badge/License-MIT-blue)](#라이선스)
 
 오늘 쓴 일기를 Gemini가 읽어 감정을 파악하고, 그 감정에 맞는 영화를 TMDB에서 찾아 추천합니다.
 추천으로 끝내지 않고 일기와 추천 기록이 남아 지난 감정을 다시 볼 수 있습니다.
@@ -27,11 +26,14 @@
 
 ## 설계 판단
 
-### 외부 API를 두 곳 호출한다 → 동기 프레임워크를 버렸다
+### 외부 API를 두 곳 호출한다 → async를 기본 지원하는 프레임워크를 골랐다
 
 감정 분석(Gemini)과 영화 조회(TMDB)가 **둘 다 네트워크 대기**입니다.
-동기 처리로 두면 한 요청이 두 번의 외부 대기를 순차로 물고 서버 스레드를 잡습니다.
-초기 Flask 구조에서 **async를 기본 지원하는 FastAPI로 옮겨** 대기 구간에서 다른 요청을 처리할 수 있게 했습니다.
+한 요청이 두 번의 외부 대기를 순차로 물기 때문에, 대기 구간에서 다른 요청을 처리할 수 있는 구조가 필요했습니다.
+그래서 **async를 기본 지원하는 FastAPI**를 골랐고, Gemini 호출은 `generate_content_async`로 비동기 처리합니다.
+
+**아직 절반만 했습니다.** TMDB 조회는 여전히 동기 `requests` 호출이라 그 구간에서는 이벤트 루프가 막힙니다.
+`httpx`가 이미 의존성에 있으므로 비동기 클라이언트로 바꾸는 것이 다음 정리 대상입니다.
 
 ### 상시 서버를 두지 않았다
 
@@ -86,10 +88,6 @@ cd frontend && npm install && npm run dev
 - 사용자 수·응답 시간 등 **운영 지표는 측정하지 않았습니다.** 측정 근거가 있는 프로젝트는 [benefit-compass](https://github.com/crushonyou2/benefit-compass)(60문항 평가셋)와 [Fridge-D-Day](https://github.com/crushonyou2/Fridge-D-Day)(55장 회귀 기준선)입니다.
 - 일기와 추천 기록은 브라우저 로컬에 저장되며 서버에 보관하지 않습니다. 기기를 바꾸면 이어지지 않습니다.
 - 감정 분석 결과는 LLM 출력이므로 같은 글에도 표현이 달라질 수 있습니다.
-
-## 라이선스
-
-MIT
 
 ## 만든 사람
 
